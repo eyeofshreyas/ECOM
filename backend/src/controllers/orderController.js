@@ -28,6 +28,8 @@ const addOrderItems = async (req, res, next) => {
                 taxPrice,
                 shippingPrice,
                 totalPrice,
+                status: 'pending',
+                expiresAt: new Date(Date.now() + 30 * 60 * 1000),
             });
 
             const createdOrder = await order.save();
@@ -68,6 +70,7 @@ const updateOrderToPaid = async (req, res, next) => {
 
         if (order) {
             order.isPaid = true;
+            order.status = 'paid';
             order.paidAt = Date.now();
             order.paymentResult = {
                 id: req.body.id,
@@ -120,6 +123,7 @@ const updateOrderToDelivered = async (req, res, next) => {
 
         if (order) {
             order.isDelivered = true;
+            order.status = 'delivered';
             order.deliveredAt = Date.now();
 
             const updatedOrder = await order.save();
