@@ -6,6 +6,9 @@ const morgan = require('morgan');
 const app = express();
 
 // Middleware
+// Raw body for webhook signature verification — MUST be before express.json()
+app.use('/api/payment/stripe/webhook', express.raw({ type: 'application/json' }));
+app.use('/api/payment/razorpay/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
