@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ interface Order {
         qty: number;
         price: number;
         image: string;
+        product?: string;
     }>;
     totalPrice: number;
     isPaid: boolean;
@@ -26,6 +27,8 @@ interface Order {
     createdAt: string;
     paidAt?: string;
     deliveredAt?: string;
+    status?: string;
+    paymentMethod?: string;
 }
 
 export default function Profile() {
@@ -42,6 +45,7 @@ export default function Profile() {
         password: '',
     });
     const { toast } = useToast();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -106,6 +110,7 @@ export default function Profile() {
     };
 
     const getOrderStatus = (order: Order) => {
+        if (order.status === 'cancelled') return { text: 'Cancelled', icon: X, color: 'bg-red-500' };
         if (order.isDelivered) return { text: 'Delivered', icon: CheckCircle, color: 'bg-green-500' };
         if (order.isPaid) return { text: 'In Transit', icon: Truck, color: 'bg-blue-500' };
         return { text: 'Processing', icon: Clock, color: 'bg-yellow-500' };
@@ -281,10 +286,20 @@ export default function Profile() {
                                                             ))}
                                                         </div>
 
-                                                        <div className="mt-4 pt-4 border-t border-border">
+                                                        <div className="mt-4 pt-4 border-t border-border flex gap-2 flex-wrap">
                                                             <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
                                                                 <Link to={`/order/${order._id}`}>View Details</Link>
                                                             </Button>
+                                                            {order.status === 'cancelled' && order.orderItems[0] && (
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="secondary"
+                                                                    className="w-full sm:w-auto"
+                                                                    onClick={() => navigate('/products')}
+                                                                >
+                                                                    Reorder
+                                                                </Button>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 );
