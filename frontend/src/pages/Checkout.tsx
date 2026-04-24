@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -12,6 +14,11 @@ import { ArrowLeft, ShoppingBag, Truck, CreditCard, CheckCircle } from 'lucide-r
 import { useToast } from '@/hooks/use-toast';
 import { Product } from '@/types/product';
 import api from '@/lib/api';
+import StripePayment from '@/components/payment/StripePayment';
+
+declare global {
+    interface Window { Razorpay: any; }
+}
 
 export default function Checkout() {
     const navigate = useNavigate();
@@ -20,8 +27,10 @@ export default function Checkout() {
     const [loading, setLoading] = useState(false);
     const [orderPlaced, setOrderPlaced] = useState(false);
     const [orderId, setOrderId] = useState('');
+    const [stripeClientSecret, setStripeClientSecret] = useState('');
+    const [stripePromise, setStripePromise] = useState<ReturnType<typeof loadStripe> | null>(null);
+    const [awaitingPayment, setAwaitingPayment] = useState(false);
 
-    // Get product and quantity from location state
     const product = location.state?.product as Product | undefined;
     const quantity = location.state?.quantity || 1;
 
@@ -34,19 +43,31 @@ export default function Checkout() {
 
     const [paymentMethod, setPaymentMethod] = useState('Cash on Delivery');
 
+    // Load Razorpay script once
     useEffect(() => {
-        if (!product) {
-            navigate('/products');
-        }
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.async = true;
+        document.body.appendChild(script);
+        return () => { document.body.removeChild(script); };
+    }, []);
+
+    // Fetch Stripe publishable key once
+    useEffect(() => {
+        api.get('/payment/config/stripe').then(({ data }) => {
+            setStripePromise(loadStripe(data));
+        });
+    }, []);
+
+    useEffect(() => {
+        if (!product) navigate('/products');
     }, [product, navigate]);
 
-    if (!product) {
-        return null;
-    }
+    if (!product) return null;
 
     const itemsPrice = product.price * quantity;
     const shippingPrice = itemsPrice > 2500 ? 0 : 50;
-    const taxPrice = Math.round(itemsPrice * 0.18); // 18% GST
+    const taxPrice = Math.round(itemsPrice * 0.18);
     const totalPrice = itemsPrice + shippingPrice + taxPrice;
 
     const handlePlaceOrder = async (e: React.FormEvent) => {
@@ -80,14 +101,31 @@ export default function Checkout() {
                 totalPrice,
             };
 
-            const { data } = await api.post('/orders', orderData);
-            setOrderId(data._id);
-            setOrderPlaced(true);
+            const { data: order } = await api.post('/orders', orderData);
+            setOrderId(order._id);
 
-            toast({
-                title: 'Order Placed Successfully!',
-                description: `Your order #${data._id.slice(-8).toUpperCase()} has been placed.`,
-            });
+            if (paymentMethod === 'Stripe') {
+                const { data } = await api.post('/payment/stripe', {
+                    amount: totalPrice,
+                    orderId: order._id,
+                });
+                setStripeClientSecret(data.clientSecret);
+                setAwaitingPayment(true);
+                setLoading(false);
+            } else if (paymentMethod === 'Razorpay') {
+                const { data: rzpOrder } = await api.post('/payment/razorpay', {
+                    amount: totalPrice,
+                    orderId: order._id,
+                });
+                openRazorpayModal(rzpOrder, order._id);
+            } else {
+                // Cash on Delivery
+                setOrderPlaced(true);
+                toast({
+                    title: 'Order Placed Successfully!',
+                    description: `Your order #${order._id.slice(-8).toUpperCase()} has been placed.`,
+                });
+            }
         } catch (error: any) {
             toast({
                 title: 'Error',
@@ -96,6 +134,55 @@ export default function Checkout() {
             });
             setLoading(false);
         }
+    };
+
+    const openRazorpayModal = (rzpOrder: any, mongoOrderId: string) => {
+        const storedUser = localStorage.getItem('userInfo');
+        const user = storedUser ? JSON.parse(storedUser) : {};
+
+        const options = {
+            key: '',
+            amount: rzpOrder.amount,
+            currency: rzpOrder.currency,
+            order_id: rzpOrder.id,
+            name: 'ECOM Store',
+            description: 'Order Payment',
+            prefill: {
+                name: user.name || '',
+                email: user.email || '',
+            },
+            handler: () => {
+                setOrderPlaced(true);
+                toast({
+                    title: 'Payment Successful!',
+                    description: `Order #${mongoOrderId.slice(-8).toUpperCase()} confirmed.`,
+                });
+            },
+            modal: {
+                ondismiss: () => {
+                    toast({
+                        title: 'Payment Cancelled',
+                        description: 'Your order will expire in 30 minutes if unpaid.',
+                        variant: 'destructive',
+                    });
+                    setLoading(false);
+                },
+            },
+        };
+
+        api.get('/payment/config/razorpay').then(({ data: keyId }) => {
+            const rzp = new window.Razorpay({ ...options, key: keyId });
+            rzp.open();
+            setLoading(false);
+        });
+    };
+
+    const handleStripeSuccess = () => {
+        setOrderPlaced(true);
+        toast({
+            title: 'Payment Successful!',
+            description: `Order #${orderId.slice(-8).toUpperCase()} confirmed.`,
+        });
     };
 
     if (orderPlaced) {
@@ -116,18 +203,12 @@ export default function Checkout() {
                                 <p className="text-sm text-muted-foreground mb-1">Order ID</p>
                                 <p className="font-mono font-semibold text-lg">#{orderId.slice(-8).toUpperCase()}</p>
                             </div>
-
                             <div className="space-y-2 text-sm">
                                 <p className="text-muted-foreground">
                                     Thank you for your order! We'll send you a confirmation email shortly.
                                 </p>
-                                <p className="text-muted-foreground">
-                                    You can track your order status from your profile page.
-                                </p>
                             </div>
-
                             <Separator />
-
                             <div className="space-y-2">
                                 <Button asChild className="w-full">
                                     <Link to="/profile">View Order in Profile</Link>
@@ -149,7 +230,6 @@ export default function Checkout() {
             <Header />
             <main className="flex-1 bg-secondary/20">
                 <div className="container mx-auto py-8 px-4">
-                    {/* Back Button */}
                     <Button variant="ghost" className="mb-6" onClick={() => navigate(-1)}>
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         Back to Product
@@ -159,7 +239,6 @@ export default function Checkout() {
 
                     <form onSubmit={handlePlaceOrder}>
                         <div className="grid lg:grid-cols-3 gap-8">
-                            {/* Checkout Form */}
                             <div className="lg:col-span-2 space-y-6">
                                 {/* Shipping Information */}
                                 <Card>
@@ -181,7 +260,6 @@ export default function Checkout() {
                                                 required
                                             />
                                         </div>
-
                                         <div className="grid sm:grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <Label htmlFor="city">City *</Label>
@@ -204,15 +282,9 @@ export default function Checkout() {
                                                 />
                                             </div>
                                         </div>
-
                                         <div className="space-y-2">
                                             <Label htmlFor="country">Country</Label>
-                                            <Input
-                                                id="country"
-                                                value={shippingInfo.country}
-                                                onChange={(e) => setShippingInfo({ ...shippingInfo, country: e.target.value })}
-                                                disabled
-                                            />
+                                            <Input id="country" value={shippingInfo.country} disabled />
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -226,8 +298,22 @@ export default function Checkout() {
                                         </CardTitle>
                                         <CardDescription>Select your payment option</CardDescription>
                                     </CardHeader>
-                                    <CardContent>
+                                    <CardContent className="space-y-3">
                                         <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                                            <div className="flex items-center space-x-3 border border-border rounded-lg p-4">
+                                                <RadioGroupItem value="Stripe" id="stripe" />
+                                                <Label htmlFor="stripe" className="flex-1 cursor-pointer">
+                                                    <p className="font-medium">Credit / Debit Card</p>
+                                                    <p className="text-sm text-muted-foreground">Powered by Stripe — Visa, Mastercard, Amex</p>
+                                                </Label>
+                                            </div>
+                                            <div className="flex items-center space-x-3 border border-border rounded-lg p-4">
+                                                <RadioGroupItem value="Razorpay" id="razorpay" />
+                                                <Label htmlFor="razorpay" className="flex-1 cursor-pointer">
+                                                    <p className="font-medium">UPI / Cards / Netbanking</p>
+                                                    <p className="text-sm text-muted-foreground">Powered by Razorpay</p>
+                                                </Label>
+                                            </div>
                                             <div className="flex items-center space-x-3 border border-border rounded-lg p-4">
                                                 <RadioGroupItem value="Cash on Delivery" id="cod" />
                                                 <Label htmlFor="cod" className="flex-1 cursor-pointer">
@@ -236,6 +322,16 @@ export default function Checkout() {
                                                 </Label>
                                             </div>
                                         </RadioGroup>
+
+                                        {/* Stripe card form — shown after order is created */}
+                                        {awaitingPayment && paymentMethod === 'Stripe' && stripeClientSecret && stripePromise && (
+                                            <Elements stripe={stripePromise} options={{ clientSecret: stripeClientSecret }}>
+                                                <StripePayment
+                                                    clientSecret={stripeClientSecret}
+                                                    onSuccess={handleStripeSuccess}
+                                                />
+                                            </Elements>
+                                        )}
                                     </CardContent>
                                 </Card>
                             </div>
@@ -250,7 +346,6 @@ export default function Checkout() {
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
-                                        {/* Product Item */}
                                         <div className="flex gap-4">
                                             <img
                                                 src={product.image}
@@ -263,10 +358,7 @@ export default function Checkout() {
                                                 <p className="font-semibold mt-1">₹{product.price.toLocaleString('en-IN')}</p>
                                             </div>
                                         </div>
-
                                         <Separator />
-
-                                        {/* Price Breakdown */}
                                         <div className="space-y-2 text-sm">
                                             <div className="flex justify-between">
                                                 <span className="text-muted-foreground">Subtotal</span>
@@ -282,26 +374,18 @@ export default function Checkout() {
                                                 <span className="text-muted-foreground">Tax (GST 18%)</span>
                                                 <span>₹{taxPrice.toLocaleString('en-IN')}</span>
                                             </div>
-
-                                            {shippingPrice > 0 && (
-                                                <p className="text-xs text-muted-foreground pt-2">
-                                                    Add ₹{(2500 - itemsPrice).toLocaleString('en-IN')} more for FREE shipping
-                                                </p>
-                                            )}
                                         </div>
-
                                         <Separator />
-
-                                        {/* Total */}
                                         <div className="flex justify-between text-lg font-semibold">
                                             <span>Total</span>
                                             <span>₹{totalPrice.toLocaleString('en-IN')}</span>
                                         </div>
 
-                                        {/* Place Order Button */}
-                                        <Button type="submit" className="w-full" size="lg" disabled={loading}>
-                                            {loading ? 'Placing Order...' : 'Place Order'}
-                                        </Button>
+                                        {!awaitingPayment && (
+                                            <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                                                {loading ? 'Processing...' : 'Place Order'}
+                                            </Button>
+                                        )}
 
                                         <p className="text-xs text-center text-muted-foreground">
                                             By placing this order, you agree to our terms and conditions
