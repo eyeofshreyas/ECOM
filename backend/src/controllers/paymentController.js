@@ -3,11 +3,14 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const Order = require('../models/Order');
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripeSecret = process.env.STRIPE_SECRET_KEY || 'test_key';
+const stripe = new Stripe(stripeSecret);
 
+const razorpayKeyId = process.env.RAZORPAY_KEY_ID || 'test_key_id';
+const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET || 'test_key_secret';
 const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
+    key_id: razorpayKeyId,
+    key_secret: razorpayKeySecret,
 });
 
 // @desc    Get Stripe Publishable Key

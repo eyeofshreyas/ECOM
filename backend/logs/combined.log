@@ -1,0 +1,5 @@
+{"level":"error","message":"500 - Cannot set property query of [object Object] which has only a getter - / - GET - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-25 15:53:41"}
+{"level":"error","message":"500 - Cannot set property query of [object Object] which has only a getter - /api/unknown - GET - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-25 15:53:41"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [25/Apr/2026:10:24:29 +0000] \"GET / HTTP/1.1\" 200 17 \"-\" \"-\"","service":"ecom-backend","timestamp":"2026-04-25 15:54:29"}
+{"level":"error","message":"500 - Not Found - /api/unknown - /api/unknown - GET - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-25 15:54:29"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [25/Apr/2026:10:24:29 +0000] \"GET /api/unknown HTTP/1.1\" 404 6737 \"-\" \"-\"","service":"ecom-backend","timestamp":"2026-04-25 15:54:29"}

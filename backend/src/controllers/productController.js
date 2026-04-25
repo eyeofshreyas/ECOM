@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const { clearCache } = require('../middlewares/cacheMiddleware');
 
 // @desc    Fetch all products
 // @route   GET /api/products
@@ -64,6 +65,7 @@ const createProduct = async (req, res, next) => {
         });
 
         const createdProduct = await product.save();
+        clearCache('/api/products');
         res.status(201).json(createdProduct);
     } catch (error) {
         next(error);
@@ -97,6 +99,7 @@ const updateProduct = async (req, res, next) => {
             product.countInStock = countInStock;
 
             const updatedProduct = await product.save();
+            clearCache('/api/products');
             res.json(updatedProduct);
         } else {
             res.status(404);
@@ -116,6 +119,7 @@ const deleteProduct = async (req, res, next) => {
 
         if (product) {
             await product.deleteOne();
+            clearCache('/api/products');
             res.json({ message: 'Product removed' });
         } else {
             res.status(404);
