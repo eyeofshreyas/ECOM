@@ -6,6 +6,11 @@ const startCancelExpiredOrdersJob = require('./jobs/cancelExpiredOrders');
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
+if (!MONGO_URI) {
+    console.error('FATAL ERROR: MONGO_URI is not defined in the environment variables.');
+    process.exit(1);
+}
+
 mongoose
     .connect(MONGO_URI)
     .then(() => {
@@ -17,4 +22,5 @@ mongoose
     })
     .catch((err) => {
         console.error('Database connection error:', err);
+        process.exit(1);
     });
