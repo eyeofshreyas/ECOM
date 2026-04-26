@@ -211,10 +211,16 @@ const authGoogle = async (req, res, next) => {
         }
 
         const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-        const ticket = await client.verifyIdToken({
-            idToken: credential,
-            audience: process.env.GOOGLE_CLIENT_ID,
-        });
+        let ticket;
+        try {
+            ticket = await client.verifyIdToken({
+                idToken: credential,
+                audience: process.env.GOOGLE_CLIENT_ID,
+            });
+        } catch {
+            res.status(401);
+            throw new Error('Invalid Google token');
+        }
 
         const payload = ticket.getPayload();
         const { name, email, sub: googleId } = payload;

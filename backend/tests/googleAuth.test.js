@@ -1,3 +1,4 @@
+require('dotenv').config();
 const request = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../src/app');
@@ -43,6 +44,7 @@ describe('POST /api/users/auth/google', () => {
             email: 'testuser@gmail.com',
             isAdmin: false,
         });
+        expect(res.body._id).toBeDefined();
         expect(res.body.token).toBeDefined();
 
         const user = await User.findOne({ email: 'testuser@gmail.com' });
