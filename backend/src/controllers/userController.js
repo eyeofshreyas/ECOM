@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
+const { OAuth2Client } = require('google-auth-library');
 
 // @desc    Auth user & get token
 // @route   POST /api/users/login
@@ -197,9 +198,57 @@ const deleteUser = async (req, res, next) => {
     }
 };
 
+// @desc    Auth user via Google OAuth
+// @route   POST /api/users/auth/google
+// @access  Public
+const authGoogle = async (req, res, next) => {
+    try {
+        const { credential } = req.body;
+
+        if (!credential) {
+            res.status(401);
+            throw new Error('Invalid Google token');
+        }
+
+        const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        const { name, email, sub: googleId } = payload;
+
+        let user = await User.findOne({ email });
+
+        if (user) {
+            if (!user.googleId) {
+                user.googleId = googleId;
+                await user.save();
+            }
+        } else {
+            user = await User.create({ name, email, googleId });
+        }
+
+        res.json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            token: generateToken(user._id),
+        });
+    } catch (error) {
+        if (!res.statusCode || res.statusCode === 200) {
+            res.status(500);
+        }
+        next(error);
+    }
+};
+
 module.exports = {
     authUser,
     registerUser,
+    authGoogle,
     getUserProfile,
     updateUserProfile,
     getAllUsers,
