@@ -3,6 +3,7 @@ const router = express.Router();
 const {
     authUser,
     registerUser,
+    authGoogle,
     getUserProfile,
     updateUserProfile,
     getAllUsers,
@@ -14,6 +15,7 @@ const { protect, admin } = require('../middlewares/authMiddleware');
 
 router.route('/').post(registerUser).get(protect, admin, getAllUsers);
 router.post('/login', authUser);
+router.post('/auth/google', authGoogle);
 router.route('/profile').get(protect, getUserProfile).put(protect, updateUserProfile);
 router
     .route('/:id')
