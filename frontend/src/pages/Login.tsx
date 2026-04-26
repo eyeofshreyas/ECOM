@@ -16,7 +16,7 @@ import {
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import api from "@/lib/api";
-import { GoogleLogin } from "@react-oauth/google";
+import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -74,7 +74,11 @@ const Login = () => {
         }
     };
 
-    const handleGoogleSuccess = async (credentialResponse: any) => {
+    const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+        if (!credentialResponse.credential) {
+            toast({ variant: "destructive", title: "Google sign-in failed", description: "No credential received" });
+            return;
+        }
         try {
             setIsLoading(true);
             const { data } = await api.post('/users/auth/google', {
@@ -90,7 +94,7 @@ const Login = () => {
         } catch (error: any) {
             toast({
                 variant: "destructive",
-                title: "Login failed",
+                title: "Google sign-in failed",
                 description: error.response?.data?.message || "Google sign-in failed",
             });
         } finally {
