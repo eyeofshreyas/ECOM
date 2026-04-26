@@ -16,6 +16,7 @@ import {
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import api from "@/lib/api";
+import { GoogleLogin } from "@react-oauth/google";
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -73,6 +74,38 @@ const Login = () => {
         }
     };
 
+    const handleGoogleSuccess = async (credentialResponse: any) => {
+        try {
+            setIsLoading(true);
+            const { data } = await api.post('/users/auth/google', {
+                credential: credentialResponse.credential,
+            });
+            localStorage.setItem('userInfo', JSON.stringify(data));
+            toast({
+                title: "Logged in!",
+                description: "Welcome back.",
+            });
+            navigate(redirect);
+            window.location.reload();
+        } catch (error: any) {
+            toast({
+                variant: "destructive",
+                title: "Login failed",
+                description: error.response?.data?.message || "Google sign-in failed",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleGoogleError = () => {
+        toast({
+            variant: "destructive",
+            title: "Login failed",
+            description: "Google sign-in failed",
+        });
+    };
+
     return (
         <div className="container flex items-center justify-center min-h-[calc(100vh-4rem)] py-12">
             <Card className="w-full max-w-md">
@@ -116,6 +149,21 @@ const Login = () => {
                             </Button>
                         </form>
                     </Form>
+                    <div className="relative my-4">
+                        <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-background px-2 text-muted-foreground">or</span>
+                        </div>
+                    </div>
+                    <div className="flex justify-center">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={handleGoogleError}
+                            useOneTap={false}
+                        />
+                    </div>
                 </CardContent>
                 <CardFooter className="flex justify-center border-t p-4">
                     <p className="text-sm text-muted-foreground">
