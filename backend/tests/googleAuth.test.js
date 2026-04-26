@@ -9,10 +9,10 @@ jest.mock('google-auth-library', () => {
     const mockGetPayload = jest.fn();
     const mockVerifyIdToken = jest.fn().mockResolvedValue({ getPayload: mockGetPayload });
     const MockOAuth2Client = jest.fn().mockImplementation(() => ({ verifyIdToken: mockVerifyIdToken }));
-    return { OAuth2Client: MockOAuth2Client, _mockGetPayload: mockGetPayload };
+    return { OAuth2Client: MockOAuth2Client, _mockGetPayload: mockGetPayload, _mockVerifyIdToken: mockVerifyIdToken };
 });
 
-const { _mockGetPayload } = require('google-auth-library');
+const { _mockGetPayload, _mockVerifyIdToken } = require('google-auth-library');
 
 beforeAll(async () => {
     await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/mern_ecom_test');
@@ -90,6 +90,17 @@ describe('POST /api/users/auth/google', () => {
         const res = await request(app)
             .post('/api/users/auth/google')
             .send({});
+
+        expect(res.statusCode).toBe(401);
+        expect(res.body.message).toBe('Invalid Google token');
+    });
+
+    it('returns 401 when Google token is invalid or expired', async () => {
+        _mockVerifyIdToken.mockRejectedValueOnce(new Error('Token expired'));
+
+        const res = await request(app)
+            .post('/api/users/auth/google')
+            .send({ credential: 'expired-fake-token' });
 
         expect(res.statusCode).toBe(401);
         expect(res.body.message).toBe('Invalid Google token');
