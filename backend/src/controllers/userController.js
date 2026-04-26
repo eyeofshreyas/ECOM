@@ -2,6 +2,8 @@ const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 const { OAuth2Client } = require('google-auth-library');
 
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 // @desc    Auth user & get token
 // @route   POST /api/users/login
 // @access  Public
@@ -205,15 +207,14 @@ const authGoogle = async (req, res, next) => {
     try {
         const { credential } = req.body;
 
-        if (!credential) {
+        if (!credential || typeof credential !== 'string') {
             res.status(401);
             throw new Error('Invalid Google token');
         }
 
-        const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
         let ticket;
         try {
-            ticket = await client.verifyIdToken({
+            ticket = await googleClient.verifyIdToken({
                 idToken: credential,
                 audience: process.env.GOOGLE_CLIENT_ID,
             });
@@ -224,6 +225,11 @@ const authGoogle = async (req, res, next) => {
 
         const payload = ticket.getPayload();
         const { name, email, sub: googleId } = payload;
+
+        if (!payload.email_verified) {
+            res.status(401);
+            throw new Error('Google account email not verified');
+        }
 
         let user = await User.findOne({ email });
 
@@ -244,9 +250,6 @@ const authGoogle = async (req, res, next) => {
             token: generateToken(user._id),
         });
     } catch (error) {
-        if (!res.statusCode || res.statusCode === 200) {
-            res.status(500);
-        }
         next(error);
     }
 };

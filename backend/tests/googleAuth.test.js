@@ -29,6 +29,7 @@ beforeEach(async () => {
         name: 'Test User',
         email: 'testuser@gmail.com',
         sub: 'google-uid-123',
+        email_verified: true,
     });
 });
 
