@@ -5,7 +5,7 @@ export const categories: Category[] = [
   { id: '2', name: 'Fashion', icon: '👔', count: 512, image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&q=80' },
   { id: '3', name: 'Home & Living', icon: '🏠', count: 189, image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&q=80' },
   { id: '4', name: 'Beauty', icon: '✨', count: 156, image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&q=80' },
-  { id: '5', name: 'Sports', icon: '⚽', count: 98, image: 'https://images.unsplash.com/photo-1461896836934- voices?w=400&q=80' },
+  { id: '5', name: 'Sports', icon: '⚽', count: 98, image: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=400&q=80' },
   { id: '6', name: 'Books', icon: '📚', count: 324, image: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&q=80' },
 ];
 

@@ -1,3 +1,51 @@
 {"level":"error","message":"500 - Cannot set property query of [object Object] which has only a getter - / - GET - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-25 15:53:41"}
 {"level":"error","message":"500 - Cannot set property query of [object Object] which has only a getter - /api/unknown - GET - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-25 15:53:41"}
 {"level":"error","message":"500 - Not Found - /api/unknown - /api/unknown - GET - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-25 15:54:29"}
+{"level":"error","message":"500 - Not authorized, no token - /api/users/login - GET - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 00:31:00"}
+{"level":"error","message":"500 - Invalid email or password - /api/users/login - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 00:32:31"}
+{"level":"error","message":"500 - User already exists - /api/users - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 00:33:29"}
+{"level":"error","message":"500 - Invalid email or password - /api/users/login - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 00:33:46"}
+{"level":"error","message":"500 - Invalid email or password - /api/users/login - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 00:33:51"}
+{"level":"error","message":"500 - Not Found - /api/users/auth/google - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:09:40"}
+{"level":"error","message":"500 - Not Found - /api/users/auth/google - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:09:41"}
+{"level":"error","message":"500 - Not Found - /api/users/auth/google - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:09:41"}
+{"level":"error","message":"500 - Not Found - /api/users/auth/google - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:09:41"}
+{"level":"error","message":"500 - secretOrPrivateKey must have a value - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:16:12"}
+{"level":"error","message":"500 - secretOrPrivateKey must have a value - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:16:12"}
+{"level":"error","message":"500 - secretOrPrivateKey must have a value - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:16:12"}
+{"level":"error","message":"500 - Invalid Google token - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:16:12"}
+{"level":"error","message":"500 - Invalid Google token - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:29:04"}
+{"level":"error","message":"500 - Invalid Google token - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:29:17"}
+{"level":"error","message":"500 - Not Found - /api/unknown - /api/unknown - GET - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:29:19"}
+{"level":"error","message":"500 - Invalid Google token - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:46:44"}
+{"level":"error","message":"500 - Not Found - /api/unknown - /api/unknown - GET - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:46:45"}
+{"level":"error","message":"500 - Invalid Google token - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:49:18"}
+{"level":"error","message":"500 - Invalid Google token - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:49:18"}
+{"level":"error","message":"500 - Not Found - /api/unknown - /api/unknown - GET - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:49:19"}
+{"level":"error","message":"500 - Google account email not verified - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:53:36"}
+{"level":"error","message":"500 - Google account email not verified - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:53:36"}
+{"level":"error","message":"500 - Google account email not verified - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:53:36"}
+{"level":"error","message":"500 - Invalid Google token - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:53:36"}
+{"level":"error","message":"500 - Invalid Google token - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:53:36"}
+{"level":"error","message":"500 - Not Found - /api/unknown - /api/unknown - GET - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:53:37"}
+{"level":"error","message":"500 - Invalid Google token - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:55:26"}
+{"level":"error","message":"500 - Invalid Google token - /api/users/auth/google - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:55:26"}
+{"level":"error","message":"500 - Not Found - /api/unknown - /api/unknown - GET - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 10:55:27"}
+{"level":"error","message":"500 - Cast to ObjectId failed for value \"1\" (type string) at path \"_id\" for model \"Product\" - /api/products/1 - GET - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 11:20:11"}
+{"level":"error","message":"500 - Illegal arguments: string, undefined - /api/users/login - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 16:10:01"}
+{"level":"error","message":"500 - Illegal arguments: string, undefined - /api/users/login - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 16:10:06"}
+{"level":"error","message":"500 - Invalid email or password - /api/users/login - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-26 16:10:10"}
+{"level":"error","message":"500 - undefined - /api/payment/razorpay - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-27 15:36:46"}
+{"level":"error","message":"500 - undefined - /api/payment/razorpay - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-27 15:36:54"}
+{"level":"error","message":"500 - Not Found - /api/notifications/unread-count - /api/notifications/unread-count - GET - ::1","service":"ecom-backend","timestamp":"2026-04-27 15:41:35"}
+{"level":"error","message":"500 - undefined - /api/payment/razorpay - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-27 15:41:56"}
+{"level":"error","message":"500 - undefined - /api/payment/razorpay - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-27 15:42:00"}
+{"level":"error","message":"500 - Not Found - /api/notifications/unread-count - /api/notifications/unread-count - GET - ::1","service":"ecom-backend","timestamp":"2026-04-27 15:42:06"}
+{"level":"error","message":"500 - undefined - /api/payment/razorpay - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-27 15:42:12"}
+{"level":"error","message":"500 - undefined - /api/payment/razorpay - POST - ::ffff:127.0.0.1","service":"ecom-backend","timestamp":"2026-04-27 15:46:46"}
+{"level":"error","message":"500 - Not Found - /api/notifications/unread-count - /api/notifications/unread-count - GET - ::1","service":"ecom-backend","timestamp":"2026-04-27 15:49:56"}
+{"level":"error","message":"500 - Not Found - /api/auth/google - /api/auth/google - GET - ::1","service":"ecom-backend","timestamp":"2026-04-27 15:50:08"}
+{"level":"error","message":"500 - Not Found - /favicon.ico - /favicon.ico - GET - ::1","service":"ecom-backend","timestamp":"2026-04-27 15:50:09"}
+{"level":"error","message":"500 - Not Found - /api/auth/google - /api/auth/google - GET - ::1","service":"ecom-backend","timestamp":"2026-04-27 15:50:15"}
+{"level":"error","message":"500 - Not Found - /api/auth/google - /api/auth/google - GET - ::1","service":"ecom-backend","timestamp":"2026-04-27 15:50:38"}
+{"level":"error","message":"500 - Not Found - /api/auth/login - /api/auth/login - POST - ::1","service":"ecom-backend","timestamp":"2026-04-27 15:52:50"}
